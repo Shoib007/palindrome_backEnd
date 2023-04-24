@@ -1,7 +1,11 @@
+from time import sleep
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import random
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import User
+from rest_framework import status
 
 palindromes = [
     "A nut for an jar of tuna",
@@ -63,9 +67,25 @@ def verifyPalindrome(request):
     string = string.replace(".","")
     string = string.replace("'","")
     string = string.lower()
+    sleep(2);
     print(f"After Modification : {string}")
     if string == string[::-1]:
         return Response("True")
     else:
         return Response("False")
 
+@api_view(['POST','PUT'])
+def registerUser(request):
+    userDetails = request.data
+    password = make_password(userDetails['password'])   # Hashng Password
+
+    ############## Creating User ###############
+    try:
+        User.objects.create(
+            name = userDetails['username'],
+            email = userDetails['email'],
+            password = password
+        )
+    except:
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    return Response(status=status.HTTP_201_CREATED)
