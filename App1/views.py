@@ -77,15 +77,16 @@ def verifyPalindrome(request):
 @api_view(['POST','PUT'])
 def registerUser(request):
     userDetails = request.data
+    print(userDetails)
     password = make_password(userDetails['password'])   # Hashng Password
 
     ############## Creating User ###############
     try:
-        User.objects.create(
-            name = userDetails['username'],
+        user = User.objects.create(
+            username = userDetails['username'],
             email = userDetails['email'],
             password = password
         )
-    except:
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    except Exception as e:
+        return Response({'error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_201_CREATED)
